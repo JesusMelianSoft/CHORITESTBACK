@@ -29,12 +29,35 @@ const stopServer = () => {
 * Rutas de Nuestra API 
 */
 
-//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
-app.get('/api/v1/clients/:cod_user', async(req, res) => {
-    const { cod_user } = req.params;
+
+//QUERYS DE CLIENTES
+app.get('/api/v1/clientes/', async(req, res) => {
     try {
-        const sql = "SELECT * FROM clientes WHERE cod_user =? ORDER BY cod_cliente";
-        const result = await query(sql, [cod_user]);
+        const sql = "SELECT * FROM `clientes`";
+        const result = await query(sql);
+        let message = '';
+        if(result === undefined || result.length === 0) {
+            message = 'Actores table is empty';
+        }else{
+            message = 'Successfully retrieved all actors';
+        }
+
+        res.send({ 
+            error: false,
+            data: result,
+            message: message
+        })
+    } catch (error) {
+        console.log(error);
+        res.resStatus(500);
+    }
+})
+//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
+app.get('/api/v1/clientes/:id_cliente', async(req, res) => {
+    const { id_cliente } = req.params;
+    try {
+        const sql = "SELECT * FROM clientes WHERE id_cliente =?";
+        const result = await query(sql, [id_cliente]);
         let message = '';
         if(result === undefined || result.length === 0) {
             message = 'Actores table is empty';
@@ -53,27 +76,16 @@ app.get('/api/v1/clients/:cod_user', async(req, res) => {
     }
 })
 
-//BUSQUEDA POR nombre o codigo
-app.get('/api/v1/clients/:cod_user/:dato', async(req, res) => {
-    const { cod_user, dato } = req.params;
-    console.log("DATO :",dato);
-    var sql="";
-    var result;
+//QUERYS DE ALBARANES
+app.get('/api/v1/albaranes/', async(req, res) => {
     try {
-        if(dato>0){
-            sql = "SELECT * FROM clientes WHERE cod_user =? AND cod_cliente = ? ORDER BY cod_cliente";
-            console.log("SQL1", sql);
-            result = await query(sql, [cod_user, dato]);
-        }else{
-            sql = "SELECT * FROM clientes WHERE cod_user =? AND nombre_c LIKE ? ORDER BY cod_cliente";
-            console.log("SQL2", sql);
-            result = await query(sql, [cod_user, "%"+dato+"%"]);
-        }
+        const sql = "SELECT * FROM `albaranes`";
+        const result = await query(sql);
         let message = '';
         if(result === undefined || result.length === 0) {
-            message = 'No se encuentra el cliente';
+            message = 'Actores table is empty';
         }else{
-            message = 'MOSTRANDO CLIENTES...';
+            message = 'Successfully retrieved all actors';
         }
 
         res.send({ 
@@ -86,6 +98,54 @@ app.get('/api/v1/clients/:cod_user/:dato', async(req, res) => {
         res.resStatus(500);
     }
 })
+//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
+app.get('/api/v1/albaranes/:id_alb', async(req, res) => {
+    const { id_alb } = req.params;
+    try {
+        const sql = "SELECT * FROM albaranes WHERE id_alb =?";
+        const result = await query(sql, [id_alb]);
+        let message = '';
+        if(result === undefined || result.length === 0) {
+            message = 'Albaranes table is empty';
+        }else{
+            message = 'Successfully retrieved all actors';
+        }
+
+        res.send({ 
+            error: false,
+            data: result,
+            message: message
+        })
+    } catch (error) {
+        console.log(error);
+        res.resStatus(500);
+    }
+})
+
+//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
+app.get('/api/v1/albaranes/cliente/:id_cli', async(req, res) => {
+    const { id_cli } = req.params;
+    try {
+        const sql = "SELECT * FROM albaranes WHERE id_cli =?";
+        const result = await query(sql, [id_cli]);
+        let message = '';
+        if(result === undefined || result.length === 0) {
+            message = 'Albaranes table is empty';
+        }else{
+            message = 'Successfully retrieved all actors';
+        }
+
+        res.send({ 
+            error: false,
+            data: result,
+            message: message
+        })
+    } catch (error) {
+        console.log(error);
+        res.resStatus(500);
+    }
+})
+
 
 
 //HACER LOGIN EN BD
