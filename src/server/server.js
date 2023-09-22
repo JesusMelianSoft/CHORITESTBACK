@@ -224,15 +224,44 @@ app.get('/api/v1/client/:cod_client/:cod_user', async(req, res) => {
     }
 })
 //Update client by cod
-app.put('/api/v1/client/:cod_client', async(req, res) => {
+app.put('/api/v1/client/:id_cliente', async(req, res) => {
     console.log(req.body);
-    const { cod_cliente, nombre_c, apellidos_c, direccion_c, telefono_c, email_c, debe } = req.body;
-    const { cod_client } = req.params;
+    const { id_tip_fac, id_tip_alb, proveedor, departamento, sucursal, cen_entrega, CIF, dir1, dir2, dir3, cuenta_banca, provincia, localidad, nombre} = req.body;
+    const { id_cliente } = req.params;
     console.log('req.body: ',req.body);
 
     try {
-        const sql = 'UPDATE clientes SET cod_cliente = ?, nombre_c = ?, apellidos_c = ?, direccion_c = ?, telefono_c = ?, email_c = ?, debe = ? WHERE cod_cliente = ?';
-        const result = await query(sql, [cod_cliente, nombre_c, apellidos_c, direccion_c, telefono_c, email_c, debe, cod_client])
+        const sql = 'UPDATE clientes SET ' +
+        'id_tip_fac = ?,' +
+        'id_tip_alb = ?,'+
+        'proveedor = ?,'+
+        'departamento = ?,'+
+        'sucursal = ?,'+
+        'cen_entrega = ?,'+
+        'CIF = ?,'+
+        'dir1 = ?,'+
+        'dir2 = ?,'+
+        'dir3 = ?,'+
+        'cuenta_banca = ?,'+
+        'provincia = ?,'+
+        'localidad = ?,'+
+        'nombre = ?'+
+    'WHERE id_cliente = ?;';
+        const result = await query(sql, [id_tip_fac, 
+            id_tip_alb, 
+            proveedor, 
+            departamento, 
+            sucursal, 
+            cen_entrega, 
+            CIF, 
+            dir1,
+            dir2, 
+            dir3, 
+            cuenta_banca, 
+            provincia, 
+            localidad,
+            nombre,
+            id_cliente])
 
         let message = '';
         if(result.changedRows == 0){
