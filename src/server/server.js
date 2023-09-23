@@ -281,10 +281,10 @@ app.put('/api/v1/client/:id_cliente', async(req, res) => {
 })
 
 //Delete client by id
-app.delete('/api/v1/client/:cod_cliente/:cod_user', async(req, res) => {
-    const { cod_cliente, cod_user} = req.params;
+app.delete('/api/v1/client/:id_cliente', async(req, res) => {
+    const { id_cliente} = req.params;
 
-    if(!cod_cliente){
+    if(!id_cliente){
         res.status(400).send({ 
             error: true,
             message: 'provide actor id',
@@ -292,14 +292,14 @@ app.delete('/api/v1/client/:cod_cliente/:cod_user', async(req, res) => {
         })
     }
     try {
-        const sql = "DELETE FROM clientes WHERE cod_cliente = ? AND cod_user = ?";
-        const result = await query(sql, [cod_cliente, cod_user]);
+        const sql = "DELETE FROM clientes WHERE id_cliente = ?";
+        const result = await query(sql, [id_cliente]);
         let message = '';
         
         if(result.affectedRows === 0) {
             message = 'Client is not found';
         }else{
-            message = 'Client successfully delete';
+            message = 'Client ' + id_cliente + ' successfully delete';
         }
 
         res.send({
