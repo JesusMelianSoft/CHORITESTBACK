@@ -76,153 +76,6 @@ app.get('/api/v1/clientes/:id_cliente', async(req, res) => {
     }
 })
 
-//QUERYS DE ALBARANES
-app.get('/api/v1/albaranes/', async(req, res) => {
-    try {
-        const sql = "SELECT * FROM `albaranes`";
-        const result = await query(sql);
-        let message = '';
-        if(result === undefined || result.length === 0) {
-            message = 'Actores table is empty';
-        }else{
-            message = 'Successfully retrieved all actors';
-        }
-
-        res.send({ 
-            error: false,
-            data: result,
-            message: message
-        })
-    } catch (error) {
-        console.log(error);
-        res.resStatus(500);
-    }
-})
-//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
-app.get('/api/v1/albaranes/:id_alb', async(req, res) => {
-    const { id_alb } = req.params;
-    try {
-        const sql = "SELECT * FROM albaranes WHERE id_alb =?";
-        const result = await query(sql, [id_alb]);
-        let message = '';
-        if(result === undefined || result.length === 0) {
-            message = 'Albaranes table is empty';
-        }else{
-            message = 'Successfully retrieved all actors';
-        }
-
-        res.send({ 
-            error: false,
-            data: result,
-            message: message
-        })
-    } catch (error) {
-        console.log(error);
-        res.resStatus(500);
-    }
-})
-
-//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
-app.get('/api/v1/albaranes/cliente/:id_cli', async(req, res) => {
-    const { id_cli } = req.params;
-    try {
-        const sql = "SELECT * FROM albaranes WHERE id_cli =?";
-        const result = await query(sql, [id_cli]);
-        let message = '';
-        if(result === undefined || result.length === 0) {
-            message = 'Albaranes table is empty';
-        }else{
-            message = 'Successfully retrieved all actors';
-        }
-
-        res.send({ 
-            error: false,
-            data: result,
-            message: message
-        })
-    } catch (error) {
-        console.log(error);
-        res.resStatus(500);
-    }
-})
-
-
-
-//HACER LOGIN EN BD
-app.get('/api/v1/trabajador/:name/:pass', async(req, res) => {
-    const { name, pass } = req.params;
-    try {
-        const sql = "SELECT `cod_user` FROM `trabajadores` WHERE name=? AND pass=MD5(?)";
-        const result = await query(sql, [name, pass]);
-        let message = '';
-        if(result === undefined || result.length === 0) {
-            message = 'Actores table is empty';
-        }else{
-            message = 'Successfully retrieved all actors';
-        }
-
-        res.send({ 
-            error: false,
-            data: result,
-            message: message
-        })
-    } catch (error) {
-        console.log(error);
-        res.resStatus(500);
-    }
-})
-
-
-//OBTENER TRABAJADORES
-//HACER LOGIN EN BD
-app.get('/api/v1/trabajadores/', async(req, res) => {
-    const { name, pass } = req.params;
-    try {
-        const sql = "SELECT * FROM `trabajadores`";
-        const result = await query(sql);
-        let message = '';
-        if(result === undefined || result.length === 0) {
-            message = 'Actores table is empty';
-        }else{
-            message = 'Successfully retrieved all actors';
-        }
-
-        res.send({ 
-            error: false,
-            data: result,
-            message: message
-        })
-    } catch (error) {
-        console.log(error);
-        res.resStatus(500);
-    }
-})
-
-app.get('/api/v1/client/:cod_client/:cod_user', async(req, res) => {
-    console.log('PARAMS',req.params);
-    const { cod_client, cod_user } = req.params;
-    console.log('COD_CLIENTE: '+cod_client);
-    console.log('COD_USER: ',cod_user);
-    try {
-        const sql = "SELECT * FROM clientes WHERE cod_cliente = ? AND cod_user = ?";
-        const result = await query(sql, [cod_client, cod_user]);
-        let message = '';
-        if(result === undefined || result.length === 0) {
-            message = 'Actores table is empty';
-        }else{
-            message = 'Successfully retrieved all client';
-        }
-
-        res.send({ 
-            error: false,
-            data: result,
-            message: message
-        })
-    } catch (error) {
-        console.log(error);
-        res.resStatus(500);
-    }
-})
 //Update client by cod
 app.put('/api/v1/client/:id_cliente', async(req, res) => {
     console.log(req.body);
@@ -313,6 +166,156 @@ app.delete('/api/v1/client/:id_cliente', async(req, res) => {
     }
 })
 
+// Add new client
+app.post('/api/v1/client/', async(req, res) => {
+    console.log("BODY DE CLIENTE",req.body);
+    var {id_cliente, id_tip_fac, id_tip_alb, proveedor,
+    departamento, sucursal, cen_entrega, CIF, dir1, dir2, dir3, cuenta_banca,
+    provincia, localidad, nombre} = req.body;
+
+    console.log("MI CLIENTE:",id_cliente, id_tip_fac, id_tip_alb, proveedor,
+                departamento, sucursal, cen_entrega, CIF, dir1, dir2, dir3, cuenta_banca, 
+                provincia, localidad, nombre);
+    try {
+        const sql = 'INSERT INTO clientes (id_cliente, id_tip_fac, id_tip_alb, proveedor, ' + 
+                    'departamento, sucursal, cen_entrega, CIF, dir1, dir2, dir3, cuenta_banca, ' + 
+                    'provincia, localidad, nombre)VALUES(?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+        console.log('SQL:',sql)
+        const result = await query(sql, [id_cliente, id_tip_fac, id_tip_alb, proveedor,
+            departamento, sucursal, cen_entrega, CIF, dir1, dir2, dir3, cuenta_banca,
+            provincia, localidad, nombre])
+        console.log('result insertClient: ',result)
+
+        res.send({
+            error: false,
+            data: {id_cliente},
+            message: 'El cliente se ha añadido de forma correcta ' + result.insert_id
+        })
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+//QUERYS DE ALBARANES
+app.get('/api/v1/albaranes/', async(req, res) => {
+    try {
+        const sql = "SELECT * FROM `albaranes`";
+        const result = await query(sql);
+        let message = '';
+        if(result === undefined || result.length === 0) {
+            message = 'Actores table is empty';
+        }else{
+            message = 'Successfully retrieved all actors';
+        }
+
+        res.send({ 
+            error: false,
+            data: result,
+            message: message
+        })
+    } catch (error) {
+        console.log(error);
+        res.resStatus(500);
+    }
+})
+//OBTENER UNO EN ESPECIFICO
+app.get('/api/v1/albaranes/:id_alb', async(req, res) => {
+    const { id_alb } = req.params;
+    try {
+        const sql = "SELECT * FROM albaranes WHERE id_alb =?";
+        const result = await query(sql, [id_alb]);
+        let message = '';
+        if(result === undefined || result.length === 0) {
+            message = 'Albaranes table is empty';
+        }else{
+            message = 'Successfully retrieved all actors';
+        }
+
+        res.send({ 
+            error: false,
+            data: result,
+            message: message
+        })
+    } catch (error) {
+        console.log(error);
+        res.resStatus(500);
+    }
+})
+
+//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
+app.get('/api/v1/albaranes/cliente/:id_cli', async(req, res) => {
+    const { id_cli } = req.params;
+    try {
+        const sql = "SELECT * FROM albaranes WHERE id_cli =?";
+        const result = await query(sql, [id_cli]);
+        let message = '';
+        if(result === undefined || result.length === 0) {
+            message = 'Albaranes table is empty';
+        }else{
+            message = 'Successfully retrieved all actors';
+        }
+
+        res.send({ 
+            error: false,
+            data: result,
+            message: message
+        })
+    } catch (error) {
+        console.log(error);
+        res.resStatus(500);
+    }
+})
+
+//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
+app.get('/api/v1/albaranes_linea/albaran/:id_alb', async(req, res) => {
+    const { id_alb } = req.params;
+    try {
+        const sql = "SELECT * FROM albaranes_linea WHERE id_alb =?";
+        const result = await query(sql, [id_alb]);
+        let message = '';
+        if(result === undefined || result.length === 0) {
+            message = 'Albaranes table is empty';
+        }else{
+            message = 'Successfully retrieved all actors';
+        }
+
+        res.send({ 
+            error: false,
+            data: result,
+            message: message
+        })
+    } catch (error) {
+        console.log(error);
+        res.resStatus(500);
+    }
+})
+
+// Add new client
+app.post('/api/v1/albaranes_linea/:id_alb', async(req, res) => {
+    console.log("BODY DE CLIENTE",req.body);
+    var {id_linea,id_alb,cantidad,descripcion,precio_un,subtotal,total} = req.body;
+
+    console.log("MI ALBARANLINE:",id_linea,id_alb,cantidad,descripcion,precio_un,subtotal,total);
+    try {
+        const sql = 'INSERT INTO albaranes_linea,(id_linea,id_alb,cantidad,descripcion,precio_un,subtotal,total)VALUES(?, ?,?,?,?,?,?)';
+        console.log('SQL:',sql)
+        const result = await query(sql, [id_linea,id_alb,cantidad,descripcion,precio_un,subtotal,total])
+        console.log('result InsertLine: ',result)
+
+        res.send({
+            error: false,
+            data: {id_linea},
+            message: 'El cliente se ha añadido de forma correcta ' + result.insert_id
+        })
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+
+
 //OBTENER TOTAL DEL TACO
 app.get('/api/v1/totalDebeClient/:cod_user', async(req, res) => {
     const { cod_user} = req.params;
@@ -338,48 +341,7 @@ app.get('/api/v1/totalDebeClient/:cod_user', async(req, res) => {
     }
 })
 
-// Add new client
-app.post('/api/v1/client', async(req, res) => {
-    console.log("BODY DE CLIENTE",req.body);
-    var { cod_cliente, nombre_c, apellidos_c, direccion_c, telefono_c, email_c, debe, cod_user} = req.body;
 
-    if(!cod_cliente || !nombre_c) {
-        return res.status(400).send({
-            error: true,
-            message: 'provide actor first_name and last_name'
-        })
-    }
-    if(debe==="" || debe===null || debe===undefined) {
-        debe=0;
-    }
-    if(direccion_c==="" || direccion_c==null || direccion_c===undefined){
-        direccion_c="";
-    }
-    if(telefono_c==="" || telefono_c===null || telefono_c===undefined){
-        telefono_c=0;
-    }
-
-    if(email_c==="" || email_c===undefined || email_c===null){
-        email_c="";
-    }
-
-    console.log("MI CLIENTE:",cod_cliente, nombre_c, apellidos_c, direccion_c, telefono_c, email_c, debe, cod_user);
-    try {
-        const sql = 'INSERT INTO clientes (cod_cliente, nombre_c, apellidos_c, direccion_c, telefono_c, email_c, debe, cod_user) VALUES (?,?,?,?,?,?,?,?)';
-        console.log('SQL:',sql)
-        const result = await query(sql, [cod_cliente, nombre_c, apellidos_c, direccion_c, telefono_c, email_c, debe, cod_user])
-        console.log('result insertClient: ',result)
-
-        res.send({
-            error: false,
-            data: {cod_cliente},
-            message: 'Client successfully added with id ' + result.insert_id
-        })
-    } catch (error) {
-        console.log(error);
-        res.sendStatus(500);
-    }
-})
 
 //OBTENER TOTAL DEL TACO
 app.get('/api/v1/pagos/:cod_user', async(req, res) => {
