@@ -243,7 +243,7 @@ app.get('/api/v1/albaranes/:id_alb', async(req, res) => {
     }
 })
 
-//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
+//Albaranes de un cliente en especifico
 app.get('/api/v1/albaranes/cliente/:id_cli', async(req, res) => {
     const { id_cli } = req.params;
     try {
@@ -267,7 +267,63 @@ app.get('/api/v1/albaranes/cliente/:id_cli', async(req, res) => {
     }
 })
 
-//OBTENER CLIENTES DE UN TRABAJADOR ESPECIFICO
+//Delete client by id
+app.delete('/api/v1/albaranes/:id_alb', async(req, res) => {
+    const { id_alb} = req.params;
+
+    if(!id_alb){
+        res.status(400).send({ 
+            error: true,
+            message: 'provide actor id',
+
+        })
+    }
+    try {
+        const sql = "DELETE FROM albaranes WHERE id_alb = ?";
+        const result = await query(sql, [id_alb]);
+        let message = '';
+        
+        if(result.affectedRows === 0) {
+            message = 'No se ha encontrado el albarán';
+        }else{
+            message = 'Albarán ' + id_alb + ' se ha borrado correctamente';
+        }
+
+        res.send({
+            error: false,
+            data: {affectedRows: result.affectedRows},
+            message: message
+        })
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+//NUEVO ALABRAN
+app.post('/api/v1/albaranes/', async(req, res) => {
+    console.log("BODY DE ALBARAN",req.body);
+    var {id_cli, id_tip_fac, tip_pago, f_pago,tip_med,tip_impuesto,impuesto,descuento,f_ven,f_pedido,subtotal,total,aux_uno,aux_cabe} = req.body;
+
+    console.log("MI ALBARAN:",id_cli, id_tip_fac, tip_pago, f_pago,tip_med,tip_impuesto,impuesto,descuento,f_ven,f_pedido,subtotal,total,aux_uno,aux_cabe);
+    try {
+        const sql = 'INSERT INTO albaranes(id_cli,id_tip_fac,tip_pago,f_pago,tip_med,tip_impuesto,impuesto,descuento,f_ven,f_pedido,subtotal,total,aux_uno,aux_cabe)VALUES(?, ?,?,?,?,?,?,?,?,?,?,?,?,?);';
+        console.log('SQL:',sql)
+        const result = await query(sql, [id_cli, id_tip_fac, tip_pago, f_pago,tip_med,tip_impuesto,impuesto,descuento,f_ven,f_pedido,subtotal,total,aux_uno,aux_cabe])
+        console.log('result InsertAlbaran: ',result)
+
+        res.send({
+            error: false,
+            data: {id_cli},
+            message: 'El Albarán se ha añadido de forma correcta ' + result.insert_id
+        })
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+//OBTENER LINEAS DE UN ALABRAN EN ESPECIFICO
 app.get('/api/v1/albaranes_linea/albaran/:id_alb', async(req, res) => {
     const { id_alb } = req.params;
     try {
@@ -298,15 +354,71 @@ app.post('/api/v1/albaranes_linea/:id_alb', async(req, res) => {
 
     console.log("MI ALBARANLINE:",id_linea,id_alb,cantidad,descripcion,precio_un,subtotal,total);
     try {
-        const sql = 'INSERT INTO albaranes_linea,(id_linea,id_alb,cantidad,descripcion,precio_un,subtotal,total)VALUES(?, ?,?,?,?,?,?)';
+        const sql = 'INSERT INTO albaranes_linea (id_alb,cantidad,descripcion,precio_un,subtotal,total)VALUES(?,?,?,?,?,?)';
         console.log('SQL:',sql)
-        const result = await query(sql, [id_linea,id_alb,cantidad,descripcion,precio_un,subtotal,total])
+        const result = await query(sql, [id_alb,cantidad,descripcion,precio_un,subtotal,total])
+        console.log('result InsertLine: ',result)
+
+        res.send({
+            error: false,
+            data: {id_linea},
+            message: 'la línea del albarán se ha añadido de forma correcta ' + result.insert_id
+        })
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+// Add new client
+app.put('/api/v1/albaranes_linea/:id_alb', async(req, res) => {
+    console.log("BODY DE CLIENTE",req.body);
+    var {id_linea,id_alb,cantidad,descripcion,precio_un,subtotal,total} = req.body;
+
+    console.log("MI ALBARANLINE:",id_linea,id_alb,cantidad,descripcion,precio_un,subtotal,total);
+    try {
+        const sql = 'UPDATE albaranes_linea SET cantidad = ?,descripcion = ?,precio_un = ?,subtotal = ?,total = ? WHERE id_linea = ?';
+        console.log('SQL:',sql)
+        const result = await query(sql, [cantidad,descripcion,precio_un,subtotal,total, id_linea])
         console.log('result InsertLine: ',result)
 
         res.send({
             error: false,
             data: {id_linea},
             message: 'El cliente se ha añadido de forma correcta ' + result.insert_id
+        })
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+//Delete client by id
+app.delete('/api/v1/albaranes_linea/:id_linea', async(req, res) => {
+    const { id_linea} = req.params;
+
+    if(!id_linea){
+        res.status(400).send({ 
+            error: true,
+            message: 'provide actor id',
+
+        })
+    }
+    try {
+        const sql = "DELETE FROM albaranes_linea WHERE id_linea = ?";
+        const result = await query(sql, [id_linea]);
+        let message = '';
+        
+        if(result.affectedRows === 0) {
+            message = 'Linea is not found';
+        }else{
+            message = 'Linea ' + id_linea + ' successfully delete';
+        }
+
+        res.send({
+            error: false,
+            data: {affectedRows: result.affectedRows},
+            message: message
         })
     } catch (error) {
         console.log(error);
